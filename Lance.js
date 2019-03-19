@@ -6,8 +6,10 @@
 //filename: 00-lab-base.js
 //purpose: a useful base for threejs applications
 
+Physijs.scripts.worker = './libs/other/physijs/physijs_worker.js';
+Physijs.scripts.ammo = './ammo.js';
 const renderer = new THREE.WebGLRenderer({ antialias: true });
-const scene = new THREE.Scene();
+const scene = new Physijs.Scene();
 const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1.0, 1000);
 
 var angle = 0;
@@ -40,6 +42,7 @@ function init() {
     renderer.domElement.addEventListener('click', removeBlock, false);
     renderer.shadowMap.enabled = true;
 
+    scene.setGravity(new THREE.Vector3(0, -50, 0));
     document.body.appendChild(renderer.domElement);
     orbitControls = new THREE.OrbitControls(camera, renderer.domElement);
 
@@ -74,10 +77,10 @@ function setupCameraAndLight() {
 function createGeometry() {
 
     scene.add(new THREE.AxesHelper(100));
-    let plane = new THREE.Mesh(
-        new THREE.PlaneGeometry(40, 60),
-        new THREE.MeshStandardMaterial({ color: 0xD2691E })
-    );
+    let planeGeom = new THREE.PlaneGeometry(40, 60);
+    let planeMat =  Physijs.createMaterial(new THREE.MeshStandardMaterial({ color: 0xD2691E, transparent: true, opacity: 0.9 }),0.3,0.7)
+    let plane = new Physijs.BoxMesh(planeGeom,planeMat,0);
+
     plane.receiveShadow = true;
     plane.rotation.x = -Math.PI * 0.5;
     scene.add(plane);  
@@ -85,17 +88,17 @@ function createGeometry() {
 
 function createTable()
 {
-    tableTop = new THREE.Mesh(
+    tableTop = new Physijs.BoxMesh(
         new THREE.BoxGeometry(25,1.2,30),
-        new THREE.MeshStandardMaterial({color: 0x765c48})
+        Physijs.createMaterial(new THREE.MeshStandardMaterial({color: 0x765c48}))
         );
         tableTop.position.y = 10;
         tableTop.name = 'tableTop';
         scene.add(tableTop);
 
-    tableLegs = new THREE.Mesh(
+    tableLegs = new Physijs.BoxMesh(
         new THREE.BoxGeometry(1, 10, 2),
-        new THREE.MeshStandardMaterial({color: 0x765c48})
+        Physijs.createMaterial(new THREE.MeshStandardMaterial({color: 0x765c48}))
     );
     tableLegs.position.set(8, 5, 10);
     tableLegs.name ='tableLegs';
@@ -114,8 +117,22 @@ function createTable()
     scene.add(tableLegs4);
 }
 
-function createBlock()
+function createBlock({x = 0,y=12,z=0, friction = 0.3, restitution = 0.7, mass =10, color= 0xff00ff})
 {
+
+    var blockGeom = new THREE.BoxGeometry(2,2,2)
+    let blockMat = Physijs.createMaterial(new THREE.MeshStandardMaterial({
+        color: color, transparent: true, opacity: 0.9
+    }), friction, restitution);
+    block2 = new  Physijs.BoxMesh(
+        blockGeom,
+        blockMat,
+        mass);
+    block2.position.set(x,y,z);
+    block2.castShadow = true;
+    block2.receiveShadow = true;
+    scene.add(block2);
+
     block = new THREE.Mesh(
         new THREE.BoxGeometry(2,2,2),
         new THREE.MeshBasicMaterial({color: 0xff00ff})
@@ -124,12 +141,12 @@ function createBlock()
     blocks.push(block);
     block.name = 'block';
 
-    let block2 = block.clone();
-    block2.position.x = 5;
-    block2.position.y = 12;
-    blocks.push(block2);
+    let block3 = block.clone();
+    block3.position.x = 5;
+    block3.position.y = 12;
+    block3.push(block3);
 
-   
+
 }
 
 function addBlockToScene()
@@ -169,6 +186,12 @@ function removeBlock(object) //raycaster || destroys block on click using raycas
     }
 }
 
+function createGame()
+{
+    createBlock({y:12});
+    createBlock({y:15});
+}
+
 function setupDatGui() {
 
     controls = new function() {
@@ -206,11 +229,30 @@ function render() {
         
     }
 
-    
-    
-     renderer.render(scene, camera);   
+     renderer.render(scene, camera);
+     scene.simulate(undefined, 1);   
+
     requestAnimationFrame(render);  
 }
+
+function readFile(port, filename) {
+    let url = 'http://localhost:' +
+    port + //port number from data.gui
+    '/assets/games/' + //url path
+    filename + //file name from dat.gui
+    '.json'; //extension
+    //console.log(url); //debugging code
+    let request = new XMLHttpRequest();
+    request.open('GET', url);
+    request.responseType = 'json'; //try text if this doesn’t work
+    request.send();
+    request.onload = () => {
+    let data = request.responseText;
+    //console.log(data); //debugging code
+    createGame(data);
+    //createGame(JSON.parse(data)); //convert text to json
+    }
+   } 
 
 window.onload = () => {
 
@@ -218,8 +260,12 @@ window.onload = () => {
     setupCameraAndLight();
     createGeometry();
     createTable();
+
+    createGame();
+
     createBlock();
     addBlockToScene();
+
     setupDatGui();
     render();
 }
