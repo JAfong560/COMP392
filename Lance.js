@@ -29,8 +29,12 @@ var table,
     tableLegs3, 
     tableLegs4;
 
-var block;
-var blocks = [];
+var blockLower;
+var blockMiddle;
+var blockUpper;
+var blocksLower = [];
+var blocksMiddle = [];
+var blocksUpper = [];
 
 function init() {
 
@@ -116,28 +120,50 @@ function createTable()
 
 function createBlock()
 {
-    block = new THREE.Mesh(
-        new THREE.BoxGeometry(2,2,2),
+    blockLower = new THREE.Mesh(
+        new THREE.BoxGeometry(4,4,4),
         new THREE.MeshBasicMaterial({color: 0xff00ff})
     );
-    block.position.y = 12;    
-    blocks.push(block);
-    block.name = 'block';
+    blockLower.position.y = 13;    
+    blocksLower.push(blockLower);
+    blockLower.name = 'block';
 
-    let block2 = block.clone();
-    block2.position.x = 5;
-    block2.position.y = 12;
-    blocks.push(block2);
+    let blockLower2 = blockLower.clone();
+    blockLower2.position.x = 4.2;
+    blockLower2.position.y = 13;
+    blocksLower.push(blockLower2);
 
-   
+    let blockLower3 = blockLower.clone();
+    blockLower3.position.x = -4.2;
+    blockLower3.position.y = 13;
+    blocksLower.push(blockLower3);
+
+    blockMiddle = new THREE.Mesh(
+        new THREE.BoxGeometry(4,4,4),
+        new THREE.MeshBasicMaterial({color: 0x00ffff})
+    );
+    blockMiddle.position.x = -2.2;
+    blockMiddle.position.y = 18;    
+    blocksMiddle.push(blockMiddle);
+    blockMiddle.name = 'block';
+
+    let blockMiddle2 = blockMiddle.clone();
+    blockMiddle2.position.x = 2.2;
+    blockMiddle2.position.y = 18;
+    blocksMiddle.push(blockMiddle2);
+
 }
 
 function addBlockToScene()
 {
-    blocks.forEach(block => {
-        
+    blocksLower.forEach(block => {
         scene.add(block);
     });   
+
+    blocksMiddle.forEach(block =>
+        {
+            scene.add(block);
+        });
 }
 
 function removeBlock(object) //raycaster || destroys block on click using raycasting
