@@ -108,21 +108,83 @@ function createTable()
     scene.add(tableLegs4);
 }
 
-function createBlock()
+function createBlock({x = 0,y=12,z=0, friction = 0.3, restitution = 0.7, mass =10, color= 0xff00ff})
 {
+
+    var blockGeom = new THREE.BoxGeometry(2,2,2)
+    let blockMat = Physijs.createMaterial(new THREE.MeshStandardMaterial({
+        color: color, transparent: true, opacity: 0.9
+    }), friction, restitution);
+    block2 = new  Physijs.BoxMesh(
+        blockGeom,
+        blockMat,
+        mass);
+    block2.position.set(x,y,z);
+    block2.castShadow = true;
+    block2.receiveShadow = true;
+    block2.name = 'block';
+    scene.add(block2);
+
     block = new THREE.Mesh(
         new THREE.BoxGeometry(2,2,2),
         new THREE.MeshBasicMaterial({color: 0xff00ff})
     );
-    block.position.y = 12;
-    scene.add(block);
+    block.position.y = 12;    
+    blocks.push(block);
+    block.name = 'block';
+
+    let block3 = block.clone();
+    block3.position.x = 5;
+    block3.position.y = 12;
+    blocks.push(block3);
+
+
 }
 
-function removeBlock(object)
+function addBlockToScene()
 {
-    let currentBlock = scene.getObjectByName(object.block);
-    scene.remove(currentBlock);
-    animete();
+    blocks.forEach(block => {
+        
+        // scene.add(block);
+    });   
+}
+
+function removeBlock(object) //raycaster || destroys block on click using raycasting
+{
+    
+    
+    mouse.x = (object.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = - (object.clientY / window.innerHeight) * 2 + 1;
+    //mouse.x = ((object.clientX - renderer.domElement.offsetLeft) / renderer.domElement.width) * 2 - 1;
+    //mouse.y  = ((object.clientY - renderer.domElement.offsetTop) / renderer.domElement.height) * 2 + 1;
+    
+
+    
+    raycaster.setFromCamera(mouse, camera);
+
+    intersect = raycaster.intersectObjects(scene.children);
+    
+    //console.log(intersect);
+    
+   
+    for(let i = 0; i < intersect.length; i++)
+    {
+        console.log('found an object!');
+        if(intersect[i].object.name == "block")
+        {
+            console.log('removing block');
+            scene.remove(intersect[i].object);
+            scene.simulate(undefined, 1);   
+        }
+    }
+}
+
+function createGame()
+{
+    createBlock({y:12});
+    createBlock({y:15});
+    createBlock({y:16});
+    createBlock({y:25});
 }
 
 function setupDatGui() {
@@ -151,19 +213,39 @@ function setupDatGui() {
 function render() {
 
     orbitControls.update();
-    if(orbitControls.target == "block")
-    {
-        removeBlock();
-    }
+    // if(orbitControls.target == "block")
+    // {
+    //     removeBlock();
+    // }
     if (toRotate)
     {
         scene.rotation.y += speed;
-        
-        
     }
-     renderer.render(scene, camera);   
+
+     renderer.render(scene, camera);
+     scene.simulate(undefined, 1);   
+
     requestAnimationFrame(render);  
 }
+
+function readFile(port, filename) {
+    let url = 'http://localhost:' +
+    port + //port number from data.gui
+    '/assets/games/' + //url path
+    filename + //file name from dat.gui
+    '.json'; //extension
+    //console.log(url); //debugging code
+    let request = new XMLHttpRequest();
+    request.open('GET', url);
+    request.responseType = 'json'; //try text if this doesn’t work
+    request.send();
+    request.onload = () => {
+    let data = request.responseText;
+    //console.log(data); //debugging code
+    createGame(data);
+    //createGame(JSON.parse(data)); //convert text to json
+    }
+   } 
 
 window.onload = () => {
 
@@ -171,7 +253,12 @@ window.onload = () => {
     setupCameraAndLight();
     createGeometry();
     createTable();
-    createBlock();
+
+    createGame();
+
+    // createBlock();
+    addBlockToScene();
+
     setupDatGui();
     render();
 }
