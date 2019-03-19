@@ -189,10 +189,17 @@ function removeBlock(object) //raycaster || destroys block on click using raycas
     }
 }
 
-function createGame()
+function createGame(data)
 {   
-    createBlock({y:12});
-    createBlock({y:15});
+    for(let i=0; i<data.length; i++)
+    {
+        createBlock(y=data[0].position.y);
+    }
+    console.log(data[0].position.y);
+    // createBlock({y=data[0].position.y});
+    // createBlock({y:12});
+    // createBlock({y:15});
+    
 }
 
 function setupDatGui() {
@@ -257,13 +264,13 @@ function readFile(port, filename) {
     //console.log(url); //debugging code
     let request = new XMLHttpRequest();
     request.open('GET', url);
-    request.responseType = 'json'; //try text if this doesn’t work
+    request.responseType = 'text'; //try text if this doesn’t work
     request.send();
     request.onload = () => {
     let data = request.responseText;
     //console.log(data); //debugging code
-    createGame(data);
-    //createGame(JSON.parse(data)); //convert text to json
+    // createGame(data);
+    createGame(JSON.parse(data)); //convert text to json
     }
    } 
 
@@ -274,10 +281,10 @@ window.onload = () => {
     createGeometry();
     createTable();
 
-    createGame();
+    // createGame();
 
     // createBlock();
-    addBlockToScene();
+    // addBlockToScene();
 
     setupDatGui();
     render();
