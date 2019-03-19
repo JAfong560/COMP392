@@ -11,8 +11,10 @@ const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1.0, 1000);
 
 var angle = 0;
-var wheel = new THREE.Object3D();
 
+var raycaster = new THREE.Raycaster();
+var mouse = {x: 0, y: 0 };
+var intersect;
 
 var orbitControls, controls,
     speed = 0.001,
@@ -27,13 +29,15 @@ var table,
     tableLegs3, 
     tableLegs4;
 
-var block = [];
+var block;
+var blocks = [];
 
 function init() {
 
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setClearColor(0x004400);
+    renderer.domElement.addEventListener('click', removeBlock, false);
     renderer.shadowMap.enabled = true;
 
     document.body.appendChild(renderer.domElement);
@@ -86,6 +90,7 @@ function createTable()
         new THREE.MeshStandardMaterial({color: 0x765c48})
         );
         tableTop.position.y = 10;
+        tableTop.name = 'tableTop';
         scene.add(tableTop);
 
     tableLegs = new THREE.Mesh(
@@ -93,6 +98,7 @@ function createTable()
         new THREE.MeshStandardMaterial({color: 0x765c48})
     );
     tableLegs.position.set(8, 5, 10);
+    tableLegs.name ='tableLegs';
     scene.add(tableLegs);
 
     tableLegs2 = tableLegs.clone();
@@ -114,15 +120,53 @@ function createBlock()
         new THREE.BoxGeometry(2,2,2),
         new THREE.MeshBasicMaterial({color: 0xff00ff})
     );
-    block.position.y = 12;
-    scene.add(block);
+    block.position.y = 12;    
+    blocks.push(block);
+    block.name = 'block';
+
+    let block2 = block.clone();
+    block2.position.x = 5;
+    block2.position.y = 12;
+    blocks.push(block2);
+
+   
 }
 
-function removeBlock(object)
+function addBlockToScene()
 {
-    let currentBlock = scene.getObjectByName(object.block);
-    scene.remove(currentBlock);
-    animete();
+    blocks.forEach(block => {
+        
+        scene.add(block);
+    });   
+}
+
+function removeBlock(object) //raycaster || destroys block on click using raycasting
+{
+    
+    
+    mouse.x = (object.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = - (object.clientY / window.innerHeight) * 2 + 1;
+    //mouse.x = ((object.clientX - renderer.domElement.offsetLeft) / renderer.domElement.width) * 2 - 1;
+    //mouse.y  = ((object.clientY - renderer.domElement.offsetTop) / renderer.domElement.height) * 2 + 1;
+    
+
+    
+    raycaster.setFromCamera(mouse, camera);
+
+    intersect = raycaster.intersectObjects(scene.children);
+    
+    //console.log(intersect);
+    
+   
+    for(let i = 0; i < intersect.length; i++)
+    {
+        console.log('found an object!');
+        if(intersect[i].object.name == "block")
+        {
+            console.log('removing block');
+            scene.remove(intersect[i].object);
+        }
+    }
 }
 
 function setupDatGui() {
@@ -161,6 +205,9 @@ function render() {
         
         
     }
+
+    
+    
      renderer.render(scene, camera);   
     requestAnimationFrame(render);  
 }
@@ -172,6 +219,7 @@ window.onload = () => {
     createGeometry();
     createTable();
     createBlock();
+    addBlockToScene();
     setupDatGui();
     render();
 }
