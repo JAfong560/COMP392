@@ -13,8 +13,10 @@ const scene = new Physijs.Scene();
 const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1.0, 1000);
 
 var angle = 0;
-var wheel = new THREE.Object3D();
 
+var raycaster = new THREE.Raycaster();
+var mouse = {x: 0, y: 0 };
+var intersect;
 
 var orbitControls, controls,
     speed = 0.001,
@@ -29,13 +31,15 @@ var table,
     tableLegs3, 
     tableLegs4;
 
-var block = [];
+var block;
+var blocks = [];
 
 function init() {
 
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setClearColor(0x004400);
+    renderer.domElement.addEventListener('click', removeBlock, false);
     renderer.shadowMap.enabled = true;
 
     scene.setGravity(new THREE.Vector3(0, -50, 0));
@@ -89,6 +93,7 @@ function createTable()
         Physijs.createMaterial(new THREE.MeshStandardMaterial({color: 0x765c48}))
         );
         tableTop.position.y = 10;
+        tableTop.name = 'tableTop';
         scene.add(tableTop);
 
     tableLegs = new Physijs.BoxMesh(
@@ -96,6 +101,7 @@ function createTable()
         Physijs.createMaterial(new THREE.MeshStandardMaterial({color: 0x765c48}))
     );
     tableLegs.position.set(8, 5, 10);
+    tableLegs.name ='tableLegs';
     scene.add(tableLegs);
 
     tableLegs2 = tableLegs.clone();
@@ -113,25 +119,71 @@ function createTable()
 
 function createBlock({x = 0,y=12,z=0, friction = 0.3, restitution = 0.7, mass =10, color= 0xff00ff})
 {
+
     var blockGeom = new THREE.BoxGeometry(2,2,2)
     let blockMat = Physijs.createMaterial(new THREE.MeshStandardMaterial({
         color: color, transparent: true, opacity: 0.9
     }), friction, restitution);
-    block = new  Physijs.BoxMesh(
+    block2 = new  Physijs.BoxMesh(
         blockGeom,
         blockMat,
         mass);
-    block.position.set(x,y,z);
-    block.castShadow = true;
-    block.receiveShadow = true;
-    scene.add(block);
+    block2.position.set(x,y,z);
+    block2.castShadow = true;
+    block2.receiveShadow = true;
+    scene.add(block2);
+
+    block = new THREE.Mesh(
+        new THREE.BoxGeometry(2,2,2),
+        new THREE.MeshBasicMaterial({color: 0xff00ff})
+    );
+    block.position.y = 12;    
+    blocks.push(block);
+    block.name = 'block';
+
+    let block3 = block.clone();
+    block3.position.x = 5;
+    block3.position.y = 12;
+    block3.push(block3);
+
+
 }
 
-function removeBlock(object)
+function addBlockToScene()
 {
-    let currentBlock = scene.getObjectByName(object.block);
-    scene.remove(currentBlock);
-    animete();
+    blocks.forEach(block => {
+        
+        scene.add(block);
+    });   
+}
+
+function removeBlock(object) //raycaster || destroys block on click using raycasting
+{
+    
+    
+    mouse.x = (object.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = - (object.clientY / window.innerHeight) * 2 + 1;
+    //mouse.x = ((object.clientX - renderer.domElement.offsetLeft) / renderer.domElement.width) * 2 - 1;
+    //mouse.y  = ((object.clientY - renderer.domElement.offsetTop) / renderer.domElement.height) * 2 + 1;
+    
+
+    
+    raycaster.setFromCamera(mouse, camera);
+
+    intersect = raycaster.intersectObjects(scene.children);
+    
+    //console.log(intersect);
+    
+   
+    for(let i = 0; i < intersect.length; i++)
+    {
+        console.log('found an object!');
+        if(intersect[i].object.name == "block")
+        {
+            console.log('removing block');
+            scene.remove(intersect[i].object);
+        }
+    }
 }
 
 function createGame()
@@ -176,8 +228,10 @@ function render() {
         
         
     }
+
      renderer.render(scene, camera);
      scene.simulate(undefined, 1);   
+
     requestAnimationFrame(render);  
 }
 
@@ -206,7 +260,12 @@ window.onload = () => {
     setupCameraAndLight();
     createGeometry();
     createTable();
+
     createGame();
+
+    createBlock();
+    addBlockToScene();
+
     setupDatGui();
     render();
 }
