@@ -131,15 +131,18 @@ function createBlock({x = 0,y=12,z=0, friction = 0.3, restitution = 0.7, mass =1
     block2.position.set(x,y,z);
     block2.castShadow = true;
     block2.receiveShadow = true;
+    block2.name = "block"; 
     scene.add(block2);
 
-    block = new THREE.Mesh(
+    block = new Physijs.BoxMesh(
         new THREE.BoxGeometry(2,2,2),
         new THREE.MeshBasicMaterial({color: 0xff00ff})
     );
     block.position.y = 12;    
     blocks.push(block);
     block.name = 'block';
+
+
 
     let block3 = block.clone();
     block3.position.x = 5;
@@ -187,7 +190,7 @@ function removeBlock(object) //raycaster || destroys block on click using raycas
 }
 
 function createGame()
-{
+{   
     createBlock({y:12});
     createBlock({y:15});
 }
@@ -198,12 +201,22 @@ function setupDatGui() {
 
         this.rotate = toRotate;
         this.reverse = reverse;
+        this.stage1 = function(){readFile(3000,"stage1");}
+        this.stage2 = function(){readFile(3000,"stage2");}
+        this.stage3 = function(){readFile(3000,"stage3");}
+        this.stage4 = function(){readFile(3000,"stage4");}
+        this.stage5 = function(){readFile(3000,"stage5");}
 
     }
 
     let gui = new dat.GUI();
     gui.add(controls, 'rotate').onChange((e) => toRotate = e);
     gui.add(controls, 'reverse').onChange((e) => reverse = e);
+    gui.add(controls, "stage1").name("Stage 1");
+    gui.add(controls, "stage2").name("Stage 2");
+    gui.add(controls, "stage3").name("Stage 3");
+    gui.add(controls, "stage4").name("Stage 4");
+    gui.add(controls, "stage5").name("Stage 5");
     //let upperFolder = gui.addFolder('Upper arm');
     //upperFolder.add(controls, 'upperRotationX', -Math.PI * 0.5, Math.PI * 0.5);
     //upperFolder.add(controls, 'upperRotationY', -Math.PI * 0.5, Math.PI * 0.5);
