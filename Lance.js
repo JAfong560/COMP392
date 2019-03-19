@@ -144,7 +144,7 @@ function createBlock({x = 0,y=12,z=0, friction = 0.3, restitution = 0.7, mass =1
     let block3 = block.clone();
     block3.position.x = 5;
     block3.position.y = 12;
-    block3.push(block3);
+    blocks.push(block3);
 
 
 }
@@ -263,7 +263,7 @@ window.onload = () => {
 
     createGame();
 
-    createBlock();
+    // createBlock();
     addBlockToScene();
 
     setupDatGui();
