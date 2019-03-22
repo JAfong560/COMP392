@@ -31,8 +31,12 @@ var table,
     tableLegs3, 
     tableLegs4;
 
-var block;
-var blocks = [];
+var blockLower;
+var blockMiddle;
+var blockUpper;
+var blocksLower = [];
+var blocksMiddle = [];
+var blocksUpper = [];
 
 function init() {
 
@@ -89,7 +93,7 @@ function createGeometry() {
 function createTable()
 {
     tableTop = new Physijs.BoxMesh(
-        new THREE.BoxGeometry(25,1.2,30),
+        new THREE.BoxGeometry(15,1.2,20),
         Physijs.createMaterial(new THREE.MeshStandardMaterial({color: 0x765c48}))
         );
         tableTop.position.y = 10;
@@ -97,30 +101,30 @@ function createTable()
         scene.add(tableTop);
 
     tableLegs = new Physijs.BoxMesh(
-        new THREE.BoxGeometry(1, 10, 2),
+        new THREE.BoxGeometry(1, 8, 2),
         Physijs.createMaterial(new THREE.MeshStandardMaterial({color: 0x765c48}))
     );
-    tableLegs.position.set(8, 5, 10);
+    tableLegs.position.set(5, 5, 7);
     tableLegs.name ='tableLegs';
     scene.add(tableLegs);
 
     tableLegs2 = tableLegs.clone();
-    tableLegs2.position.set(-8, 5, 10);
+    tableLegs2.position.set(-5, 5, 7);
     scene.add(tableLegs2);
 
     tableLegs3 = tableLegs.clone();
-    tableLegs3.position.set(8, 5, -10);
+    tableLegs3.position.set(5, 5, -7);
     scene.add(tableLegs3);
 
     tableLegs4 = tableLegs.clone();
-    tableLegs4.position.set(-8, 5, -10);
+    tableLegs4.position.set(-5, 5, -7);
     scene.add(tableLegs4);
 }
 
-function createBlock({x = 0,y=12,z=0, friction = 0.3, restitution = 0.7, mass =10, color= 0xff00ff})
+function createBlock({x = this.x, y = this.y, z = this.z, friction = 0.3, restitution = 0.35, mass =10, color= 0xff00ff})
 {
 
-    var blockGeom = new THREE.BoxGeometry(2,2,2)
+    var blockGeom = new THREE.BoxGeometry(3,3,3)
     let blockMat = Physijs.createMaterial(new THREE.MeshStandardMaterial({
         color: color, transparent: true, opacity: 0.9
     }), friction, restitution);
@@ -128,37 +132,23 @@ function createBlock({x = 0,y=12,z=0, friction = 0.3, restitution = 0.7, mass =1
         blockGeom,
         blockMat,
         mass);
-    block2.position.set(x,y,z);
+    block2.position.x = x;
+    block2.position.y = y;
+    block2.position.z = z;
     block2.castShadow = true;
     block2.receiveShadow = true;
     block2.name = "block"; 
     scene.add(block2);
 
     block = new Physijs.BoxMesh(
-        new THREE.BoxGeometry(2,2,2),
+        new THREE.BoxGeometry(3,3,3),
         new THREE.MeshBasicMaterial({color: 0xff00ff})
     );
-    block.position.y = 12;    
-    blocks.push(block);
-    block.name = 'block';
-
-
-
-    let block3 = block.clone();
-    block3.position.x = 5;
-    block3.position.y = 12;
-    blocks.push(block3);
+    
 
 
 }
 
-function addBlockToScene()
-{
-    blocks.forEach(block => {
-        
-        scene.add(block);
-    });   
-}
 
 function removeBlock(object) //raycaster || destroys block on click using raycasting
 {
@@ -193,9 +183,13 @@ function createGame(data)
 {   
     for(let i=0; i<data.length; i++)
     {
-        createBlock(y=data[0].position.y);
+        createBlock(x=data[i].position.x, y=data[i].position.y, z=data[i].position.z);
+        console.log(i);
+        console.log(data[i].position.x);
+        console.log(data[i].position.y);
+        console.log(data[i].position.z);
     }
-    console.log(data[0].position.y);
+    
     // createBlock({y=data[0].position.y});
     // createBlock({y:12});
     // createBlock({y:15});
