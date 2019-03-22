@@ -121,12 +121,13 @@ function createTable()
     scene.add(tableLegs4);
 }
 
-function createBlock({x = this.x, y = this.y, z = this.z, friction = 0.3, restitution = 0.35, mass =10, color= 0xff00ff})
+function createBlock({x = this.x, y = this.y, z = this.z, friction = 0.3, restitution = 0.35, mass =10, color= this.color})
 {
 
+    var blockColor = new THREE.Color(color);
     var blockGeom = new THREE.BoxGeometry(3,3,3)
     let blockMat = Physijs.createMaterial(new THREE.MeshStandardMaterial({
-        color: color, transparent: true, opacity: 0.9
+        color: blockColor, transparent: true, opacity: 0.9
     }), friction, restitution);
     block2 = new  Physijs.BoxMesh(
         blockGeom,
@@ -183,7 +184,7 @@ function createGame(data)
 {   
     for(let i=0; i<data.length; i++)
     {
-        createBlock(x=data[i].position.x, y=data[i].position.y, z=data[i].position.z);
+        createBlock(x=data[i].position.x, y=data[i].position.y, z=data[i].position.z, color=data[i].color);
         console.log(i);
         console.log(data[i].position.x);
         console.log(data[i].position.y);
