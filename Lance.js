@@ -176,7 +176,9 @@ function removeBlock(object) //raycaster || destroys block on click using raycas
         {
             console.log('removing block');
             scene.remove(intersect[i].object);
+            // scene.simulate(undefined,1);
         }
+        break;
     }
 }
 
@@ -185,9 +187,9 @@ function createGame(data)
     for(let i=0; i<data.length; i++)
     {
         createBlock(x=data[i].position.x, y=data[i].position.y, z=data[i].position.z, color=data[i].color);
-        console.log(i);
-        console.log(data[i].position.x);
-        console.log(data[i].position.y);
+        // console.log(i);
+        // console.log(data[i].position.x);
+        // console.log(data[i].position.y);
         console.log(data[i].position.z);
     }
     

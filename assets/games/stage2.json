@@ -2,33 +2,271 @@
   {
     "id": "1",
     "name": "block",
-    "color": "0xff0000",
+    "color": "#ff0000",
     "position": {
-      "x": "0",
-      "y": "12",
-      "z": "0"
+      "x": -3,
+      "y": 12,
+      "z": -3
     }
   },
-
   {
     "id": "2",
     "name": "block",
-    "color": "0x00ff00",
+    "color": "#ff0000",
     "position": {
-      "x": "3",
-      "y": "12",
-      "z": "0"
+      "x": 0,
+      "y": 12,
+      "z": -3
     }
   },
-
   {
     "id": "3",
     "name": "block",
-    "color": "0x0000ff",
+    "color": "#ff0000",
     "position": {
-      "x": "-3",
-      "y": "12",
-      "z": "0"
+      "x": 3,
+      "y": 12,
+      "z": -3
+    }
+  },
+  {
+    "id": "1",
+    "name": "block",
+    "color": "#ff0000",
+    "position": {
+      "x": -3,
+      "y": 12,
+      "z": 0
+    }
+  },
+  {
+    "id": "2",
+    "name": "block",
+    "color": "#ff0000",
+    "position": {
+      "x": 0,
+      "y": 12,
+      "z": 0
+    }
+  },
+  {
+    "id": "3",
+    "name": "block",
+    "color": "#ff0000",
+    "position": {
+      "x": 3,
+      "y": 12,
+      "z": 0
+    }
+  },
+  {
+    "id": "1",
+    "name": "block",
+    "color": "#ff0000",
+    "position": {
+      "x": -3,
+      "y": 12,
+      "z": 3
+    }
+  },
+  {
+    "id": "2",
+    "name": "block",
+    "color": "#ff0000",
+    "position": {
+      "x": 0,
+      "y": 12,
+      "z": 3
+    }
+  },
+  {
+    "id": "3",
+    "name": "block",
+    "color": "#ff0000",
+    "position": {
+      "x": 3,
+      "y": 12,
+      "z": 3
+    }
+  },
+  {
+    "id": "4",
+    "name": "block",
+    "color": "#00ff00",
+    "position": {
+      "x": -3,
+      "y": 15,
+      "z": -3
+    }
+  },
+  {
+    "id": "5",
+    "name": "block",
+    "color": "#00ff00",
+    "position": {
+      "x": 0,
+      "y": 15,
+      "z": -3
+    }
+  },
+  {
+    "id": "6",
+    "name": "block",
+    "color": "#00ff00",
+    "position": {
+      "x": 3,
+      "y": 15,
+      "z": -3
+    }
+  },
+  {
+    "id": "4",
+    "name": "block",
+    "color": "#00ff00",
+    "position": {
+      "x": -3,
+      "y": 15,
+      "z": 0
+    }
+  },
+  {
+    "id": "5",
+    "name": "block",
+    "color": "#00ff00",
+    "position": {
+      "x": 0,
+      "y": 15,
+      "z": 0
+    }
+  },
+  {
+    "id": "6",
+    "name": "block",
+    "color": "#00ff00",
+    "position": {
+      "x": 3,
+      "y": 15,
+      "z": 0
+    }
+  },
+  {
+    "id": "4",
+    "name": "block",
+    "color": "#00ff00",
+    "position": {
+      "x": -3,
+      "y": 15,
+      "z": 3
+    }
+  },
+  {
+    "id": "5",
+    "name": "block",
+    "color": "#00ff00",
+    "position": {
+      "x": 0,
+      "y": 15,
+      "z": 3
+    }
+  },
+  {
+    "id": "6",
+    "name": "block",
+    "color": "#00ff00",
+    "position": {
+      "x": 3,
+      "y": 15,
+      "z": 3
+    }
+  },
+  {
+    "id": "7",
+    "name": "block",
+    "color": "#0000ff",
+    "position": {
+      "x": -3,
+      "y": 18,
+      "z": -3
+    }
+  },
+  {
+    "id": "8",
+    "name": "block",
+    "color": "#0000ff",
+    "position": {
+      "x": 0,
+      "y": 18,
+      "z": -3
+    }
+  },
+  {
+    "id": "9",
+    "name": "block",
+    "color": "#0000ff",
+    "position": {
+      "x": 3,
+      "y": 18,
+      "z": -3
+    }
+  },
+  {
+    "id": "7",
+    "name": "block",
+    "color": "#0000ff",
+    "position": {
+      "x": -3,
+      "y": 18,
+      "z": 0
+    }
+  },
+  {
+    "id": "8",
+    "name": "block",
+    "color": "#0000ff",
+    "position": {
+      "x": 0,
+      "y": 18,
+      "z": 0
+    }
+  },
+  {
+    "id": "9",
+    "name": "block",
+    "color": "#0000ff",
+    "position": {
+      "x": 3,
+      "y": 18,
+      "z": 0
+    }
+  },
+  {
+    "id": "7",
+    "name": "block",
+    "color": "#0000ff",
+    "position": {
+      "x": -3,
+      "y": 18,
+      "z": 3
+    }
+  },
+  {
+    "id": "8",
+    "name": "block",
+    "color": "#0000ff",
+    "position": {
+      "x": 0,
+      "y": 18,
+      "z": 3
+    }
+  },
+  {
+    "id": "9",
+    "name": "block",
+    "color": "#0000ff",
+    "position": {
+      "x": 3,
+      "y": 18,
+      "z": 3
     }
   }
 ]
