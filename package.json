@@ -1,0 +1,4 @@
+{ "scripts": {    
+    "dev": "lite-server"
+  }
+}

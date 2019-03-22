@@ -1,7 +1,7 @@
 [
   {
     "id": "1",
-    "name": "red",
+    "name": "block",
     "color": "0xff0000",
     "position": {
       "x": "0",
@@ -12,23 +12,23 @@
 
   {
     "id": "2",
-    "name": "green",
+    "name": "block",
     "color": "0x00ff00",
     "position": {
       "x": "3",
-      "y": "15",
-      "z": "3"
+      "y": "12",
+      "z": "0"
     }
   },
 
   {
     "id": "3",
-    "name": "blue",
+    "name": "block",
     "color": "0x0000ff",
     "position": {
       "x": "-3",
-      "y": "118",
-      "z": "5"
+      "y": "12",
+      "z": "0"
     }
   }
 ]
