@@ -31,12 +31,7 @@ var table,
     tableLegs3, 
     tableLegs4;
 
-var blockLower;
-var blockMiddle;
-var blockUpper;
-var blocksLower = [];
-var blocksMiddle = [];
-var blocksUpper = [];
+var blocks = [];
 
 function init() {
 
@@ -139,6 +134,7 @@ function createBlock({x = this.x, y = this.y, z = this.z, friction = 0.3, restit
     block2.castShadow = true;
     block2.receiveShadow = true;
     block2.name = "block"; 
+    blocks.push(block2);
     scene.add(block2);
 
     block = new Physijs.BoxMesh(
@@ -182,6 +178,16 @@ function removeBlock(object) //raycaster || destroys block on click using raycas
     }
 }
 
+function removeObjects()
+{
+    for(var i = blocks.length; i > 0; i--)
+    {
+        var removeBlocks = scene.getObjectByName('block');
+        scene.remove(removeBlocks);
+    }
+}
+
+
 function createGame(data)
 {   
     for(let i=0; i<data.length; i++)
@@ -190,13 +196,27 @@ function createGame(data)
         // console.log(i);
         // console.log(data[i].position.x);
         // console.log(data[i].position.y);
-        console.log(data[i].position.z);
+        //console.log(data[i].position.z);
     }
     
     // createBlock({y=data[0].position.y});
     // createBlock({y:12});
     // createBlock({y:15});
     
+}
+
+function resetGame()
+{
+    console.log('finding block(s) for reset')
+    if(scene.getObjectByName('block'))
+    {
+        console.log('found blocks... resetting game');
+        removeObjects();
+    }
+    else
+    {
+        console.log('no blocks found... reset not necessary');
+    }
 }
 
 function setupDatGui() {
@@ -210,6 +230,10 @@ function setupDatGui() {
         this.stage3 = function(){readFile(3000,"stage3");}
         this.stage4 = function(){readFile(3000,"stage4");}
         this.stage5 = function(){readFile(3000,"stage5");}
+        this.reset = function()
+        {
+            resetGame();
+        }
 
     }
 
@@ -221,6 +245,7 @@ function setupDatGui() {
     gui.add(controls, "stage3").name("Stage 3");
     gui.add(controls, "stage4").name("Stage 4");
     gui.add(controls, "stage5").name("Stage 5");
+    gui.add(controls, 'reset').name('Reset Game');
     //let upperFolder = gui.addFolder('Upper arm');
     //upperFolder.add(controls, 'upperRotationX', -Math.PI * 0.5, Math.PI * 0.5);
     //upperFolder.add(controls, 'upperRotationY', -Math.PI * 0.5, Math.PI * 0.5);
