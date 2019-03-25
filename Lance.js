@@ -32,7 +32,7 @@ var table,
     tableLegs4;
 
 var blocks = [];
-
+var DISABLE_DEACTIVATION = 4;
 function init() {
 
     renderer.setPixelRatio(window.devicePixelRatio);
@@ -42,6 +42,7 @@ function init() {
     renderer.shadowMap.enabled = true;
 
     scene.setGravity(new THREE.Vector3(0, -50, 0));
+
     document.body.appendChild(renderer.domElement);
     orbitControls = new THREE.OrbitControls(camera, renderer.domElement);
 
@@ -116,14 +117,15 @@ function createTable()
     scene.add(tableLegs4);
 }
 
-function createBlock({x = this.x, y = this.y, z = this.z, friction = 0.3, restitution = 0.35, mass =10, color= this.color})
+function createBlock({x = this.x, y = this.y, z = this.z, friction = 0.3, restitution = 0.1, mass =10, color= this.color})
 {
-
+    
     var blockColor = new THREE.Color(color);
     var blockGeom = new THREE.BoxGeometry(3,3,3)
     let blockMat = Physijs.createMaterial(new THREE.MeshStandardMaterial({
-        color: blockColor, transparent: true, opacity: 0.9
+        color: blockColor, transparent: true, opacity: 0.9,
     }), friction, restitution);
+    
     block2 = new  Physijs.BoxMesh(
         blockGeom,
         blockMat,
@@ -134,36 +136,22 @@ function createBlock({x = this.x, y = this.y, z = this.z, friction = 0.3, restit
     block2.castShadow = true;
     block2.receiveShadow = true;
     block2.name = "block"; 
+    block2.__dirtyPosition = true;
     blocks.push(block2);
+
     scene.add(block2);
-
-    block = new Physijs.BoxMesh(
-        new THREE.BoxGeometry(3,3,3),
-        new THREE.MeshBasicMaterial({color: 0xff00ff})
-    );
-    
-
-
 }
-
 
 function removeBlock(object) //raycaster || destroys block on click using raycasting
 {
-    
-    
     mouse.x = (object.clientX / window.innerWidth) * 2 - 1;
     mouse.y = - (object.clientY / window.innerHeight) * 2 + 1;
     //mouse.x = ((object.clientX - renderer.domElement.offsetLeft) / renderer.domElement.width) * 2 - 1;
     //mouse.y  = ((object.clientY - renderer.domElement.offsetTop) / renderer.domElement.height) * 2 + 1;
-    
 
-    
     raycaster.setFromCamera(mouse, camera);
 
-    intersect = raycaster.intersectObjects(scene.children);
-    
-    //console.log(intersect);
-    
+    intersect = raycaster.intersectObjects(scene.children);   
    
     for(let i = 0; i < intersect.length; i++)
     {
@@ -172,10 +160,13 @@ function removeBlock(object) //raycaster || destroys block on click using raycas
         {
             console.log('removing block');
             scene.remove(intersect[i].object);
-            // scene.simulate(undefined,1);
+
         }
         break;
     }
+    blocks.forEach(block => {
+        block.__dirtyPosition = true;
+    });
 }
 
 function removeObjects()
@@ -190,20 +181,21 @@ function removeObjects()
 
 function createGame(data)
 {   
-    for(let i=0; i<data.length; i++)
+    if(scene.getObjectByName('block'))
     {
-        createBlock(x=data[i].position.x, y=data[i].position.y, z=data[i].position.z, color=data[i].color);
-        // console.log(i);
-        // console.log(data[i].position.x);
-        // console.log(data[i].position.y);
-        //console.log(data[i].position.z);
+        console.log('a game is in progress!');
     }
-    
-    // createBlock({y=data[0].position.y});
-    // createBlock({y:12});
-    // createBlock({y:15});
-    
+    else
+    {
+        for(let i=0; i<data.length; i++)
+        {
+            createBlock(x=data[i].position.x, y=data[i].position.y, z=data[i].position.z, color=data[i].color);
+        }
+    }
 }
+
+
+
 
 function resetGame()
 {
@@ -234,7 +226,6 @@ function setupDatGui() {
         {
             resetGame();
         }
-
     }
 
     let gui = new dat.GUI();
@@ -246,35 +237,19 @@ function setupDatGui() {
     gui.add(controls, "stage4").name("Stage 4");
     gui.add(controls, "stage5").name("Stage 5");
     gui.add(controls, 'reset').name('Reset Game');
-    //let upperFolder = gui.addFolder('Upper arm');
-    //upperFolder.add(controls, 'upperRotationX', -Math.PI * 0.5, Math.PI * 0.5);
-    //upperFolder.add(controls, 'upperRotationY', -Math.PI * 0.5, Math.PI * 0.5);
-    //upperFolder.add(controls, 'upperRotationZ', -Math.PI * 0.5, Math.PI * 0.5);
-
-    
-    //gui.add(controls, 'stop').name('Stop rotation').onChange((stop) => speed = !stop ? 0.01 : 0);
-
 }
 
 
 function render() {
 
     orbitControls.update();
-    if(orbitControls.target == "block")
-    {
-        removeBlock();
-    }
-    if (toRotate)
-    {
-        scene.rotation.y += speed;
-        
-        
-    }
-
-     renderer.render(scene, camera);
-     scene.simulate(undefined, 1);   
+   
 
     requestAnimationFrame(render);  
+    renderer.render(scene, camera);
+    scene.simulate(undefined, 1);   
+
+   
 }
 
 function readFile(port, filename) {
