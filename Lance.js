@@ -83,7 +83,7 @@ function setupCameraAndLight() {
 
 function createGeometry() {
 
-    scene.add(new THREE.AxesHelper(100));
+    //scene.add(new THREE.AxesHelper(100));
     let planeGeom = new THREE.PlaneGeometry(40, 60);
     let planeMat =  Physijs.createMaterial(new THREE.MeshStandardMaterial({ color: 0xD2691E, transparent: true, opacity: 0.9 }),0.3,0.7)
     let plane = new Physijs.BoxMesh(planeGeom,planeMat,0);
@@ -161,7 +161,7 @@ function removeBlock(object) //raycaster || destroys block on click using raycas
    
     for(let i = 0; i < intersect.length; i++)
     {
-        console.log('found an object!');
+        //console.log('found an object!');
         if(intersect[i].object.name == "block")
         {
             console.log('removing block');
@@ -198,17 +198,20 @@ function removeObjects()
 
 function createGame(data)
 {   
-    score = 0;
-    time = 0;
-    controls.score = 0;
-    controls.finalScore = 0;
-    starter = true;
+    
     if(scene.getObjectByName('block'))
     {
         console.log('a game is in progress!');
     }
     else
     {
+        score = 0;
+        time = 0;
+        finalScore = 0;
+        controls.score = 0;
+        controls.finalScore = 0;
+        controls.time = 0;
+        starter = true;
         for(let i=0; i<data.length; i++)
         {
             createBlock(x=data[i].position.x, y=data[i].position.y, z=data[i].position.z, color=data[i].color);
@@ -220,10 +223,7 @@ function createGame(data)
 function timer()
 {
     time += 1000;
-    if(time % 60000 == 0) 
-    {
-        console.log(time / 60000);
-    }
+    controls.time = time / 60000;
     
 }
 
@@ -275,9 +275,11 @@ function setupDatGui() {
         }
         this.score = score;
         this.finalScore = finalScore;
+        this.time = time;
     }
 
     let gui = new dat.GUI();
+    gui.width = 150;
     gui.add(controls, "stage1").name("Stage 1");
     gui.add(controls, "stage2").name("Stage 2");
     gui.add(controls, "stage3").name("Stage 3");
@@ -291,6 +293,10 @@ function setupDatGui() {
     gui.add(controls, 'finalScore').name('Final Score:').listen().onChange((c) => 
     {
         controls.finalScore = finalScore;
+    });
+    gui.add(controls, 'time').step(.01,).name('Time:').listen().onChange((c) => 
+    {
+        controls.time = time;
     });
     
 }
