@@ -32,7 +32,13 @@ var table,
     tableLegs4;
 
 var blocks = [];
-var DISABLE_DEACTIVATION = 4;
+
+var starter = false;
+var isActive = false;
+var points = 100;
+var score = 0;
+var time = 0; //in milliseconds
+
 function init() {
 
     renderer.setPixelRatio(window.devicePixelRatio);
@@ -160,13 +166,23 @@ function removeBlock(object) //raycaster || destroys block on click using raycas
         {
             console.log('removing block');
             scene.remove(intersect[i].object);
-
+            score = score + points;
+            console.log(score);
+            blocks.length --;
         }
         break;
     }
     blocks.forEach(block => {
         block.__dirtyPosition = true;
+        block.__dirtyRotation = true;
     });
+
+    if(blocks.length == 0)
+    {
+        isActive = false;
+        calculateScore(score);
+    }
+   
 }
 
 function removeObjects()
@@ -176,11 +192,16 @@ function removeObjects()
         var removeBlocks = scene.getObjectByName('block');
         scene.remove(removeBlocks);
     }
+    isActive = false;
 }
 
 
 function createGame(data)
 {   
+    score = 0;
+    time = 0;
+    starter = true;
+    console.log(isActive);
     if(scene.getObjectByName('block'))
     {
         console.log('a game is in progress!');
@@ -191,14 +212,36 @@ function createGame(data)
         {
             createBlock(x=data[i].position.x, y=data[i].position.y, z=data[i].position.z, color=data[i].color);
         }
+        isActive = true;
     }
+
+    
 }
 
+function timer()
+{
+    time += 1000;
+    if(time % 60000 == 0) 
+    {
+        console.log(time / 60000);
+    }
+    
+}
 
-
+function calculateScore(score)
+{
+    console.log('function calculateScore called');
+    var finalscore = Math.round(score - (time / 60000 * 6));
+    console.log(finalscore);
+    //post score before this line!
+    score = 0;
+}
 
 function resetGame()
 {
+    isActive = false;
+    score = 0;
+    time = 0;
     console.log('finding block(s) for reset')
     if(scene.getObjectByName('block'))
     {
@@ -211,12 +254,11 @@ function resetGame()
     }
 }
 
+
+
 function setupDatGui() {
 
     controls = new function() {
-
-        this.rotate = toRotate;
-        this.reverse = reverse;
         this.stage1 = function(){readFile(3000,"stage1");}
         this.stage2 = function(){readFile(3000,"stage2");}
         this.stage3 = function(){readFile(3000,"stage3");}
@@ -229,8 +271,6 @@ function setupDatGui() {
     }
 
     let gui = new dat.GUI();
-    gui.add(controls, 'rotate').onChange((e) => toRotate = e);
-    gui.add(controls, 'reverse').onChange((e) => reverse = e);
     gui.add(controls, "stage1").name("Stage 1");
     gui.add(controls, "stage2").name("Stage 2");
     gui.add(controls, "stage3").name("Stage 3");
@@ -243,12 +283,18 @@ function setupDatGui() {
 function render() {
 
     orbitControls.update();
-   
+    if(isActive)
+    {
+        timer();
+    }
 
+    
+    
     requestAnimationFrame(render);  
     renderer.render(scene, camera);
     scene.simulate(undefined, 1);   
-
+    
+    
    
 }
 
