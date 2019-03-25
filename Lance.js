@@ -37,6 +37,7 @@ var starter = false;
 var isActive = false;
 var points = 100;
 var score = 0;
+var finalScore = 0;
 var time = 0; //in milliseconds
 
 function init() {
@@ -142,7 +143,6 @@ function createBlock({x = this.x, y = this.y, z = this.z, friction = 0.3, restit
     block2.castShadow = true;
     block2.receiveShadow = true;
     block2.name = "block"; 
-    block2.__dirtyPosition = true;
     blocks.push(block2);
 
     scene.add(block2);
@@ -167,7 +167,7 @@ function removeBlock(object) //raycaster || destroys block on click using raycas
             console.log('removing block');
             scene.remove(intersect[i].object);
             score = score + points;
-            console.log(score);
+            controls.score = score;
             blocks.length --;
         }
         break;
@@ -177,7 +177,7 @@ function removeBlock(object) //raycaster || destroys block on click using raycas
         block.__dirtyRotation = true;
     });
 
-    if(blocks.length == 0)
+    if(blocks.length == 0 && isActive)
     {
         isActive = false;
         calculateScore(score);
@@ -200,8 +200,9 @@ function createGame(data)
 {   
     score = 0;
     time = 0;
+    controls.score = 0;
+    controls.finalScore = 0;
     starter = true;
-    console.log(isActive);
     if(scene.getObjectByName('block'))
     {
         console.log('a game is in progress!');
@@ -214,8 +215,6 @@ function createGame(data)
         }
         isActive = true;
     }
-
-    
 }
 
 function timer()
@@ -230,9 +229,14 @@ function timer()
 
 function calculateScore(score)
 {
-    console.log('function calculateScore called');
-    var finalscore = Math.round(score - (time / 60000 * 6));
-    console.log(finalscore);
+    console.log('final score:');
+    finalScore = Math.round(score - (time / 60000 * 10) * 1.2);
+    if(finalScore < 50)
+    {
+        finalScore = 50;
+    }
+    controls.finalScore = finalScore;
+    console.log(finalScore);
     //post score before this line!
     score = 0;
 }
@@ -241,6 +245,7 @@ function resetGame()
 {
     isActive = false;
     score = 0;
+    finalScore = 0;
     time = 0;
     console.log('finding block(s) for reset')
     if(scene.getObjectByName('block'))
@@ -268,6 +273,8 @@ function setupDatGui() {
         {
             resetGame();
         }
+        this.score = score;
+        this.finalScore = finalScore;
     }
 
     let gui = new dat.GUI();
@@ -277,8 +284,16 @@ function setupDatGui() {
     gui.add(controls, "stage4").name("Stage 4");
     gui.add(controls, "stage5").name("Stage 5");
     gui.add(controls, 'reset').name('Reset Game');
+    gui.add(controls, 'score').name('Score:').listen().onChange((c) => 
+    {
+        controls.score = score;
+    });
+    gui.add(controls, 'finalScore').name('Final Score:').listen().onChange((c) => 
+    {
+        controls.finalScore = finalScore;
+    });
+    
 }
-
 
 function render() {
 
@@ -287,15 +302,9 @@ function render() {
     {
         timer();
     }
-
-    
-    
     requestAnimationFrame(render);  
     renderer.render(scene, camera);
     scene.simulate(undefined, 1);   
-    
-    
-   
 }
 
 function readFile(port, filename) {
@@ -321,6 +330,7 @@ window.onload = () => {
 
     init();
     setupCameraAndLight();
+    setupDatGui();
     createGeometry();
     createTable();
 
@@ -329,6 +339,5 @@ window.onload = () => {
     // createBlock();
     // addBlockToScene();
 
-    setupDatGui();
     render();
 }
