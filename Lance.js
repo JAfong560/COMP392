@@ -39,6 +39,7 @@ var points = 100;
 var score = 0;
 var finalScore = 0;
 var time = 0; //in milliseconds
+var clicks = 20;
 
 function init() {
 
@@ -162,12 +163,14 @@ function removeBlock(object) //raycaster || destroys block on click using raycas
     for(let i = 0; i < intersect.length; i++)
     {
         //console.log('found an object!');
-        if(intersect[i].object.name == "block")
+        if((intersect[i].object.name == "block") && (clicks != 0))
         {
             console.log('removing block');
             scene.remove(intersect[i].object);
             score = score + points;
             controls.score = score;
+            clicks--;
+            controls.clicks = clicks;
             blocks.length --;
         }
         break;
@@ -208,9 +211,11 @@ function createGame(data)
         score = 0;
         time = 0;
         finalScore = 0;
+        clicks = 20;
         controls.score = 0;
         controls.finalScore = 0;
         controls.time = 0;
+        controls.clicks = 20;
         starter = true;
         for(let i=0; i<data.length; i++)
         {
@@ -276,6 +281,7 @@ function setupDatGui() {
         this.score = score;
         this.finalScore = finalScore;
         this.time = time;
+        this.clicks = clicks;
     }
 
     let gui = new dat.GUI();
@@ -298,7 +304,10 @@ function setupDatGui() {
     {
         controls.time = time;
     });
-    
+    gui.add(controls, 'clicks').name('Clicks Left:').listen().onChange((c) => 
+    {
+        controls.clicks = clicks;
+    });
 }
 
 function render() {
