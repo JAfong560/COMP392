@@ -23,7 +23,6 @@ var orbitControls, controls,
     toRotate = false,
     reverse = false;
 
-
 var table,
     tableTop, 
     tableLegs, 
@@ -52,8 +51,6 @@ function init() {
 
     document.body.appendChild(renderer.domElement);
     orbitControls = new THREE.OrbitControls(camera, renderer.domElement);
-
-    
 }
 
 function setupCameraAndLight() {
@@ -92,6 +89,7 @@ function createGeometry() {
     plane.receiveShadow = true;
     plane.rotation.x = -Math.PI * 0.5;
     scene.add(plane);  
+    
 }
 
 function createTable()
@@ -100,7 +98,7 @@ function createTable()
         new THREE.BoxGeometry(15,1.2,20),
         Physijs.createMaterial(new THREE.MeshStandardMaterial({color: 0x765c48}))
         );
-        tableTop.position.y = 10;
+        tableTop.position.y = 8.5;
         tableTop.castShadow = true;
         tableTop.receiveShadow = true;
         tableTop.name = 'tableTop';
@@ -129,7 +127,7 @@ function createTable()
     scene.add(tableLegs4);
 }
 
-function createBlock({x = this.x, y = this.y, z = this.z, friction = 0.3, restitution = 0.1, mass =10, color= this.color})
+function createBlock({x = this.x, y = this.y, z = this.z, friction = 0.3, restitution = 0.1, mass =25, color= this.color})
 {
     
     var blockColor = new THREE.Color(color);
@@ -150,7 +148,11 @@ function createBlock({x = this.x, y = this.y, z = this.z, friction = 0.3, restit
     block2.name = "block"; 
     blocks.push(block2);
 
+    block2.addEventListener('collision', blockOnPlane, true);
+
     scene.add(block2);
+
+   
 }
 
 function removeBlock(object) //raycaster || destroys block on click using raycasting
@@ -163,6 +165,7 @@ function removeBlock(object) //raycaster || destroys block on click using raycas
     raycaster.setFromCamera(mouse, camera);
 
     intersect = raycaster.intersectObjects(scene.children);   
+
    
     for(let i = 0; i < intersect.length; i++)
     {
@@ -174,8 +177,9 @@ function removeBlock(object) //raycaster || destroys block on click using raycas
             scene.remove(intersect[i].object);
             score = score + points;
             controls.score = score;
-            blocks.length --;
+            blocks.pop(i);
         }
+        
         break;
     }
     blocks.forEach(block => {
@@ -189,6 +193,27 @@ function removeBlock(object) //raycaster || destroys block on click using raycas
         starter = false;
         calculateScore(score);
     }
+}
+
+function blockOnPlane(block)
+{
+    this.block = block;
+    var planeFinder = scene.getObjectByName('plane');
+
+
+    if(block.position.y <= planeFinder.position.y)
+    {
+        console.log(blocks.length);
+        for(var i = blocks.length; i > 0; i--)
+        {
+            scene.remove(this);
+            blocks.pop(i);
+            break;
+        }
+        console.log(blocks.length);
+        score = score + (points /2);
+        controls.score = score;
+    }
    
 }
 
@@ -197,7 +222,11 @@ function removeObjects()
     for(var i = blocks.length; i > 0; i--)
     {
         var removeBlocks = scene.getObjectByName('block');
-        scene.remove(removeBlocks);
+        if(removeBlocks)
+        {
+            scene.remove(removeBlocks);
+        }
+        blocks.pop(i);
     }
     isActive = false;
     starter = false;
@@ -206,6 +235,7 @@ function removeObjects()
 
 function createGame(data)
 {   
+    console.log(blocks.length);
     if(scene.getObjectByName('block'))
     {
         console.log('a game is in progress!');
@@ -222,6 +252,7 @@ function createGame(data)
         {
             createBlock(x=data[i].position.x, y=data[i].position.y, z=data[i].position.z, color=data[i].color);
         }
+        console.log(blocks.length);
     }
 }
 
@@ -229,7 +260,6 @@ function timer()
 {
     time += 1000;
     controls.time = time / 60000;
-    
 }
 
 function calculateScore(score)
@@ -314,6 +344,7 @@ function render() {
     {
         timer();
     }
+    
     requestAnimationFrame(render);  
     renderer.render(scene, camera);
     scene.simulate(undefined, 1);   
@@ -345,11 +376,5 @@ window.onload = () => {
     setupDatGui();
     createGeometry();
     createTable();
-
-    // createGame();
-
-    // createBlock();
-    // addBlockToScene();
-
     render();
 }
