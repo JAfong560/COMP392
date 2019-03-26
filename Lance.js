@@ -193,6 +193,7 @@ function removeObjects()
     {
         var removeBlocks = scene.getObjectByName('block');
         scene.remove(removeBlocks);
+        blocks.pop(i);
     }
     isActive = false;
 }
@@ -204,10 +205,10 @@ function captureScore()
         this.update = function(delta) {
             this.time += delta;
             for(var i = blocks.length; i > 0; i--)
-            // while(blocks.length>0)
             {
                 var watcher = scene.getObjectByName('block');
-                if(watcher.position.y < 12)
+                // console.log(watcher.position.y);
+                if(watcher.position.y < 10)
                 {
                     score = score + points;
                     controls.score = score;
@@ -335,7 +336,6 @@ function render() {
         timer();
     }
     captureScore().update(time);
-    // blocks.forEach((obj) => obj.update(time));
     requestAnimationFrame(render);  
     renderer.render(scene, camera);
     scene.simulate(undefined, 1);   
