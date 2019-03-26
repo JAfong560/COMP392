@@ -25,7 +25,6 @@ var orbitControls, controls,
     friction = 0.1,
     restitution = 0.5;
 
-
 var table,
     tableTop, 
     tableLegs, 
@@ -39,6 +38,7 @@ var starter = false;
 var isActive = false;
 var points = 100;
 var score = 0;
+var maxScore = 0;
 var finalScore = 0;
 var time = 0; //in milliseconds
 var clicks = 20;
@@ -55,8 +55,6 @@ function init() {
 
     document.body.appendChild(renderer.domElement);
     orbitControls = new THREE.OrbitControls(camera, renderer.domElement);
-
-    
 }
 
 function setupCameraAndLight() {
@@ -95,6 +93,7 @@ function createGeometry() {
     plane.receiveShadow = true;
     plane.rotation.x = -Math.PI * 0.5;
     scene.add(plane);  
+    
 }
 
 function createTable()
@@ -103,7 +102,7 @@ function createTable()
         new THREE.BoxGeometry(15,1.2,20),
         Physijs.createMaterial(new THREE.MeshStandardMaterial({color: 0x765c48}))
         );
-        tableTop.position.y = 10;
+        tableTop.position.y = 8.5;
         tableTop.castShadow = true;
         tableTop.receiveShadow = true;
         tableTop.name = 'tableTop';
@@ -132,7 +131,7 @@ function createTable()
     scene.add(tableLegs4);
 }
 
-function createBlock({x = this.x, y = this.y, z = this.z, friction = this.friction, restitution = this.restitution, mass =10, color= this.color})
+function createBlock({x = this.x, y = this.y, z = this.z, friction = 0.3, restitution = 0.1, mass =25, color= this.color})
 {
     this.friction = friction;
     this.restitution = restitution;
@@ -151,12 +150,14 @@ function createBlock({x = this.x, y = this.y, z = this.z, friction = this.fricti
     block.position.z = z;
     block.castShadow = true;
     block.receiveShadow = true;
-    block.name = "block";
-    block.__dirtyPosition = true;
-    block.__dirtyRotation = true; 
+    block.name = "block"; 
     blocks.push(block);
 
+    block.addEventListener('collision', blockOnPlane, true);
+
     scene.add(block);
+
+   
 }
 
 function removeBlock(object) //raycaster || destroys block on click using raycasting
@@ -169,6 +170,7 @@ function removeBlock(object) //raycaster || destroys block on click using raycas
     raycaster.setFromCamera(mouse, camera);
 
     intersect = raycaster.intersectObjects(scene.children);   
+
    
     for(let i = 0; i < intersect.length; i++)
     {
@@ -182,8 +184,11 @@ function removeBlock(object) //raycaster || destroys block on click using raycas
             // controls.score = score;
             clicks--;
             controls.clicks = clicks;
-            blocks.length --;
+            score = score + points;
+            controls.score = score;
+            blocks.pop(i);
         }
+        
         break;
     }
     blocks.forEach(block => {
@@ -197,6 +202,27 @@ function removeBlock(object) //raycaster || destroys block on click using raycas
         starter = false;
         calculateScore(score);
     }
+}
+
+function blockOnPlane(block)
+{
+    this.block = block;
+    var planeFinder = scene.getObjectByName('plane');
+
+
+    if(block.position.y <= planeFinder.position.y)
+    {
+        console.log(blocks.length);
+        for(var i = blocks.length; i > 0; i--)
+        {
+            scene.remove(this);
+            blocks.pop(i);
+            break;
+        }
+        console.log(blocks.length);
+        score = score + (points /2);
+        controls.score = score;
+    }
    
 }
 
@@ -205,7 +231,10 @@ function removeObjects()
     for(var i = blocks.length; i > 0; i--)
     {
         var removeBlocks = scene.getObjectByName('block');
-        scene.remove(removeBlocks);
+        if(removeBlocks)
+        {
+            scene.remove(removeBlocks);
+        }
         blocks.pop(i);
     }
     isActive = false;
@@ -239,6 +268,7 @@ function captureScore()
 
 function createGame(data)
 {   
+    console.log(blocks.length);
     if(scene.getObjectByName('block'))
     {
         console.log('a game is in progress!');
@@ -249,15 +279,17 @@ function createGame(data)
         time = 0;
         finalScore = 0;
         clicks = 20;
+        controls.maxScore = data.length * 100;
         controls.score = 0;
         controls.finalScore = 0;
         controls.time = 0;
         controls.clicks = 20;
-        starter = true;
+        starter = false;
         for(let i=0; i<data.length; i++)
         {
             createBlock(x=data[i].position.x, y=data[i].position.y, z=data[i].position.z, color=data[i].color);
         }
+        console.log(blocks.length);
     }
 }
 
@@ -265,7 +297,6 @@ function timer()
 {
     time += 1000;
     controls.time = time / 60000;
-    
 }
 
 function calculateScore(score)
@@ -315,6 +346,7 @@ function setupDatGui() {
         {
             resetGame();
         }
+        this.maxScore = maxScore;
         this.score = score;
         this.finalScore = finalScore;
         this.time = time;
@@ -324,13 +356,16 @@ function setupDatGui() {
     }
 
     let gui = new dat.GUI();
-    gui.width = 150;
     gui.add(controls, "stage1").name("Stage 1");
     gui.add(controls, "stage2").name("Stage 2");
     gui.add(controls, "stage3").name("Stage 3");
     gui.add(controls, "stage4").name("Stage 4");
     gui.add(controls, "stage5").name("Stage 5");
     gui.add(controls, 'reset').name('Reset Game');
+    gui.add(controls, 'maxScore').name('Maximum Score:').listen().onChange((c) => 
+    {
+        controls.maxScore = maxScore;
+    });
     gui.add(controls, 'score').name('Score:').listen().onChange((c) => 
     {
         controls.score = score;
@@ -367,6 +402,7 @@ function render() {
         timer();
     }
     captureScore().update(time);
+    
     requestAnimationFrame(render);  
     renderer.render(scene, camera);
     scene.simulate(undefined, 1);   
@@ -398,11 +434,5 @@ window.onload = () => {
     setupDatGui();
     createGeometry();
     createTable();
-
-    // createGame();
-
-    // createBlock();
-    // addBlockToScene();
-
     render();
 }
