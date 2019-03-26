@@ -133,19 +133,21 @@ function createBlock({x = this.x, y = this.y, z = this.z, friction = 0.3, restit
         color: blockColor, transparent: true, opacity: 0.9,
     }), friction, restitution);
     
-    block2 = new  Physijs.BoxMesh(
+    block = new  Physijs.BoxMesh(
         blockGeom,
         blockMat,
         mass);
-    block2.position.x = x;
-    block2.position.y = y;
-    block2.position.z = z;
-    block2.castShadow = true;
-    block2.receiveShadow = true;
-    block2.name = "block"; 
-    blocks.push(block2);
+    block.position.x = x;
+    block.position.y = y;
+    block.position.z = z;
+    block.castShadow = true;
+    block.receiveShadow = true;
+    block.name = "block";
+    block.__dirtyPosition = true;
+    block.__dirtyRotation = true; 
+    blocks.push(block);
 
-    scene.add(block2);
+    scene.add(block);
 }
 
 function removeBlock(object) //raycaster || destroys block on click using raycasting
@@ -166,8 +168,8 @@ function removeBlock(object) //raycaster || destroys block on click using raycas
         {
             console.log('removing block');
             scene.remove(intersect[i].object);
-            score = score + points;
-            controls.score = score;
+            // score = score + points;
+            // controls.score = score;
             blocks.length --;
         }
         break;
@@ -193,6 +195,30 @@ function removeObjects()
         scene.remove(removeBlocks);
     }
     isActive = false;
+}
+
+function captureScore()
+{
+    let time = 0;
+    return new function(){
+        this.update = function(delta) {
+            this.time += delta;
+            for(var i = blocks.length; i > 0; i--)
+            // while(blocks.length>0)
+            {
+                var watcher = scene.getObjectByName('block');
+                if(watcher.position.y < 12)
+                {
+                    score = score + points;
+                    controls.score = score;
+                    scene.remove(watcher);
+                    blocks.pop(i);
+                    break;
+                }
+            }
+            isActive = false;
+        }
+    }
 }
 
 
@@ -308,6 +334,8 @@ function render() {
     {
         timer();
     }
+    captureScore().update(time);
+    // blocks.forEach((obj) => obj.update(time));
     requestAnimationFrame(render);  
     renderer.render(scene, camera);
     scene.simulate(undefined, 1);   
