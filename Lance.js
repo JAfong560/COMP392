@@ -89,6 +89,7 @@ function createGeometry() {
     let planeMat =  Physijs.createMaterial(new THREE.MeshStandardMaterial({ color: 0xD2691E, transparent: true, opacity: 0.9 }),0.3,0.7)
     let plane = new Physijs.BoxMesh(planeGeom,planeMat,0);
 
+    plane.name = 'plane';
     plane.receiveShadow = true;
     plane.rotation.x = -Math.PI * 0.5;
     scene.add(plane);  
@@ -101,6 +102,8 @@ function createTable()
         Physijs.createMaterial(new THREE.MeshStandardMaterial({color: 0x765c48}))
         );
         tableTop.position.y = 10;
+        tableTop.castShadow = true;
+        tableTop.receiveShadow = true;
         tableTop.name = 'tableTop';
         scene.add(tableTop);
 
@@ -109,6 +112,8 @@ function createTable()
         Physijs.createMaterial(new THREE.MeshStandardMaterial({color: 0x765c48}))
     );
     tableLegs.position.set(5, 5, 7);
+    tableLegs.castShadow = true;
+    tableLegs.receiveShadow = true;
     tableLegs.name ='tableLegs';
     scene.add(tableLegs);
 
@@ -165,6 +170,7 @@ function removeBlock(object) //raycaster || destroys block on click using raycas
         //console.log('found an object!');
         if((intersect[i].object.name == "block") && (clicks != 0))
         {
+            starter = true;
             console.log('removing block');
             scene.remove(intersect[i].object);
             score = score + points;
@@ -180,9 +186,10 @@ function removeBlock(object) //raycaster || destroys block on click using raycas
         block.__dirtyRotation = true;
     });
 
-    if(blocks.length == 0 && isActive)
+    if(blocks.length == 0 && starter)
     {
         isActive = false;
+        starter = false;
         calculateScore(score);
     }
    
@@ -196,12 +203,12 @@ function removeObjects()
         scene.remove(removeBlocks);
     }
     isActive = false;
+    starter = false;
 }
 
 
 function createGame(data)
 {   
-    
     if(scene.getObjectByName('block'))
     {
         console.log('a game is in progress!');
@@ -221,7 +228,6 @@ function createGame(data)
         {
             createBlock(x=data[i].position.x, y=data[i].position.y, z=data[i].position.z, color=data[i].color);
         }
-        isActive = true;
     }
 }
 
@@ -249,6 +255,7 @@ function calculateScore(score)
 function resetGame()
 {
     isActive = false;
+    starter = false;
     score = 0;
     finalScore = 0;
     time = 0;
@@ -313,7 +320,7 @@ function setupDatGui() {
 function render() {
 
     orbitControls.update();
-    if(isActive)
+    if(starter)
     {
         timer();
     }
