@@ -21,7 +21,9 @@ var intersect;
 var orbitControls, controls,
     speed = 0.001,
     toRotate = false,
-    reverse = false;
+    reverse = false,
+    score = 0,
+    blocks = [];
 
 
 var table,
@@ -144,6 +146,16 @@ function createBlock({x = this.x, y = this.y, z = this.z, friction = 0.3, restit
         new THREE.BoxGeometry(3,3,3),
         new THREE.MeshBasicMaterial({color: 0xff00ff})
     );
+    let updater =0;
+    this.update = function(delta) {
+        this.updater += delta;
+        if(this.block.position.y < 12)
+        {
+            score++;
+            console.log("Score is: " + score);
+            // removeBlock(this.block);
+        }
+    }
     
 
 
@@ -158,8 +170,6 @@ function removeBlock(object) //raycaster || destroys block on click using raycas
     mouse.y = - (object.clientY / window.innerHeight) * 2 + 1;
     //mouse.x = ((object.clientX - renderer.domElement.offsetLeft) / renderer.domElement.width) * 2 - 1;
     //mouse.y  = ((object.clientY - renderer.domElement.offsetTop) / renderer.domElement.height) * 2 + 1;
-    
-
     
     raycaster.setFromCamera(mouse, camera);
 
@@ -183,12 +193,15 @@ function createGame(data)
 {   
     for(let i=0; i<data.length; i++)
     {
-        createBlock(x=data[i].position.x, y=data[i].position.y, z=data[i].position.z);
+        let obj = createBlock(x=data[i].position.x, y=data[i].position.y, z=data[i].position.z);
+        blocks.push(obj);
+
         console.log(i);
         console.log(data[i].position.x);
         console.log(data[i].position.y);
         console.log(data[i].position.z);
     }
+    console.log(blocks.length);
     
     // createBlock({y=data[0].position.y});
     // createBlock({y:12});
@@ -243,6 +256,8 @@ function render() {
         
     }
 
+    // blocks.forEach((obj) => obj.update(speed));c
+
      renderer.render(scene, camera);
      scene.simulate(undefined, 1);   
 
@@ -266,7 +281,22 @@ function readFile(port, filename) {
     // createGame(data);
     createGame(JSON.parse(data)); //convert text to json
     }
-   } 
+   }
+   
+// function score()
+// {
+
+//     for(let i=0;i<blocks.length;i++ )
+//     {
+//         let block = blocks[i];
+//             if(block.position.y < 12)
+//             {
+//                 score++;
+//                 blocks.pop(block);
+//                 removeBlock(block);
+//             }
+//     }
+// }
 
 window.onload = () => {
 
