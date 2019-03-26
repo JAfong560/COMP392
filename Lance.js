@@ -21,7 +21,9 @@ var intersect;
 var orbitControls, controls,
     speed = 0.001,
     toRotate = false,
-    reverse = false;
+    reverse = false,
+    friction = 0.3,
+    restitution = 0.1;
 
 
 var table,
@@ -124,11 +126,12 @@ function createTable()
     scene.add(tableLegs4);
 }
 
-function createBlock({x = this.x, y = this.y, z = this.z, friction = 0.3, restitution = 0.1, mass =10, color= this.color})
+function createBlock({x = this.x, y = this.y, z = this.z, friction = this.friction, restitution = this.restitution, mass =10, color= this.color})
 {
-    
+    this.friction = friction;
+    this.restitution = restitution;
     var blockColor = new THREE.Color(color);
-    var blockGeom = new THREE.BoxGeometry(3,3,3)
+    var blockGeom = new THREE.BoxGeometry(3,3,3);
     let blockMat = Physijs.createMaterial(new THREE.MeshStandardMaterial({
         color: blockColor, transparent: true, opacity: 0.9,
     }), friction, restitution);
@@ -200,10 +203,10 @@ function removeObjects()
 
 function captureScore()
 {
-    let time = 0;
+    let updater = 0;
     return new function(){
         this.update = function(delta) {
-            this.time += delta;
+            this.updater += delta;
             for(var i = blocks.length; i > 0; i--)
             {
                 var watcher = scene.getObjectByName('block');
@@ -303,6 +306,8 @@ function setupDatGui() {
         this.score = score;
         this.finalScore = finalScore;
         this.time = time;
+        this.friction = friction;
+        this.restitution = restitution;
     }
 
     let gui = new dat.GUI();
@@ -324,6 +329,15 @@ function setupDatGui() {
     gui.add(controls, 'time').step(.01,).name('Time:').listen().onChange((c) => 
     {
         controls.time = time;
+    });
+    let folder = gui.addFolder('Physics');
+    folder.add(controls,'friction',0,1,0.1).name('Friction: ').onChange((c) =>
+    {
+        friction = c;
+    });
+    folder.add(controls,'restitution',0,1,0.1).name('Restitution: ').onChange((c) =>
+    {
+        restitution = c;
     });
     
 }

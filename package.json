@@ -1,4 +1,8 @@
-{ "scripts": {    
-    "dev": "lite-server"
-  }
+{
+    "scripts": {
+        "dev": "lite-server"
+    },
+    "dependencies": {
+        "@types/three": "^0.93.28"
+    }
 }
