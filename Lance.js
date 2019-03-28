@@ -131,12 +131,12 @@ function createTable()
     scene.add(tableLegs4);
 }
 
-function createBlock({x = this.x, y = this.y, z = this.z, friction = 0.3, restitution = 0.1, mass =25, color= this.color})
+function createBlock({x = this.x, y = this.y, z = this.z, friction = 0.3, restitution = 0.1, mass =25, color= this.color, height=this.height,width=this.width,length=this.length})
 {
     this.friction = friction;
     this.restitution = restitution;
     var blockColor = new THREE.Color(color);
-    var blockGeom = new THREE.BoxGeometry(3,3,3);
+    var blockGeom = new THREE.BoxGeometry(height,width,length);
     let blockMat = Physijs.createMaterial(new THREE.MeshStandardMaterial({
         color: blockColor, transparent: true, opacity: 0.9,
     }), friction, restitution);
@@ -287,7 +287,7 @@ function createGame(data)
         starter = false;
         for(let i=0; i<data.length; i++)
         {
-            createBlock(x=data[i].position.x, y=data[i].position.y, z=data[i].position.z, color=data[i].color);
+            createBlock(x=data[i].position.x, y=data[i].position.y, z=data[i].position.z, color=data[i].color, height=data[i].size.height,width=data[i].size.width,length=data[i].size.length);
         }
         console.log(blocks.length);
     }
@@ -343,6 +343,7 @@ function setupDatGui() {
         this.stage4 = function(){readFile(3000,"stage4");}
         this.stage5 = function(){readFile(3000,"stage5");}
         this.stage6 = function(){readFile(3000,"stage6");}
+        this.stage7 = function(){readFile(3000,"stage7");}
         this.reset = function()
         {
             resetGame();
@@ -363,6 +364,7 @@ function setupDatGui() {
     gui.add(controls, "stage4").name("Stage 4");
     gui.add(controls, "stage5").name("Stage 5");
     gui.add(controls, "stage6").name("Stage 6");
+    gui.add(controls, "stage7").name("Stage 7");
     gui.add(controls, 'reset').name('Reset Game');
     gui.add(controls, 'maxScore').name('Maximum Score:').listen().onChange((c) => 
     {
