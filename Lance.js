@@ -136,7 +136,7 @@ function createBlock({x = this.x, y = this.y, z = this.z, friction = 0.3, restit
     this.friction = friction;
     this.restitution = restitution;
     var blockColor = new THREE.Color(color);
-    var blockGeom = new THREE.BoxGeometry(height,width,length);
+    var blockGeom = new THREE.BoxGeometry(width,height,length);
     let blockMat = Physijs.createMaterial(new THREE.MeshStandardMaterial({
         color: blockColor, transparent: true, opacity: 0.9,
     }), friction, restitution);
