@@ -342,6 +342,7 @@ function setupDatGui() {
         this.stage3 = function(){readFile(3000,"stage3");}
         this.stage4 = function(){readFile(3000,"stage4");}
         this.stage5 = function(){readFile(3000,"stage5");}
+        this.stage6 = function(){readFile(3000,"stage6");}
         this.reset = function()
         {
             resetGame();
@@ -361,6 +362,7 @@ function setupDatGui() {
     gui.add(controls, "stage3").name("Stage 3");
     gui.add(controls, "stage4").name("Stage 4");
     gui.add(controls, "stage5").name("Stage 5");
+    gui.add(controls, "stage6").name("Stage 6");
     gui.add(controls, 'reset').name('Reset Game');
     gui.add(controls, 'maxScore').name('Maximum Score:').listen().onChange((c) => 
     {
